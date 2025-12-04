@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Marcador AR - Asistente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .step h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .step p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .preview-container {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .tips {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .tips h3 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎯 Generador de Marcador AR</h1>
+        <p class="subtitle">Sigue estos pasos para crear tu marcador de realidad aumentada</p>
+
+        <div class="preview-container">
+            <h3 style="margin-bottom: 15px; color: #667eea;">Tu Logo Actual</h3>
+            <img src="./img/logo.png" alt="Logo" id="logo-preview">
+            <p style="margin-top: 10px; color: #666;">Este es el logo que se usará como marcador AR</p>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">1</span>Abrir el Generador de Marcadores</h2>
+            <p>Haz clic en el botón de abajo para abrir la herramienta oficial de AR.js para generar marcadores:</p>
+            <br>
+            <a href="https://ar-js-org.github.io/AR.js/three.js/examples/marker-training/examples/generator.html"
+                target="_blank" class="button">
+                🚀 Abrir Generador de Marcadores AR.js
+            </a>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">2</span>Subir tu Logo</h2>
+            <p>En la página del generador:</p>
+            <ul>
+                <li>Haz clic en "Choose File" o "Seleccionar archivo"</li>
+                <li>Navega hasta la carpeta <code>img/</code> de este proyecto</li>
+                <li>Selecciona el archivo <strong>logo.png</strong></li>
+                <li>La imagen se cargará automáticamente</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">3</span>Descargar el Archivo .patt</h2>
+            <p>Una vez cargada la imagen:</p>
+            <ul>
+                <li>Verás una vista previa del patrón generado</li>
+                <li>Haz clic en el botón "Download Marker" o "Descargar Marcador"</li>
+                <li>Se descargará un archivo con extensión <strong>.patt</strong></li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">4</span>Guardar el Archivo</h2>
+            <p>Guarda el archivo descargado en la ubicación correcta:</p>
+            <div class="code-block">
+                augmented-reality/markers/pattern-logo.patt
+            </div>
+            <p style="margin-top: 10px;">
+                <strong>Importante:</strong> El archivo debe llamarse exactamente <code>pattern-logo.patt</code>
+                y estar dentro de la carpeta <code>markers/</code>
+            </p>
+        </div>
+
+        <div class="alert">
+            <strong>⚠️ Nota Importante:</strong>
+            Si el archivo descargado tiene un nombre diferente (como "pattern-marker.patt"),
+            asegúrate de renombrarlo a <strong>pattern-logo.patt</strong>
+        </div>
+
+        <div class="tips">
+            <h3>💡 Consejos para un Mejor Marcador</h3>
+            <ul>
+                <li><strong>Alto contraste:</strong> Logos con buen contraste entre colores oscuros y claros funcionan
+                    mejor</li>
+                <li><strong>Detalles únicos:</strong> Imágenes con patrones distintivos son más fáciles de detectar</li>
+                <li><strong>Evita fondos blancos:</strong> Añade un borde o fondo de color para mejorar la detección
+                </li>
+                <li><strong>Tamaño mínimo:</strong> El logo impreso debe tener al menos 10x10 cm para una buena
+                    detección</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">5</span>Iniciar el Servidor</h2>
+            <p>Una vez que tengas el archivo .patt guardado, inicia un servidor local:</p>
+            <div class="code-block">
+                # Opción 1: Python 3<br>
+                python -m http.server 8000<br>
+                <br>
+                # Opción 2: Node.js<br>
+                npx http-server -p 8000
+            </div>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">6</span>Probar la Aplicación</h2>
+            <p>Abre tu navegador y ve a:</p>
+            <div class="code-block">
+                http://localhost:8000/index-youtube.html
+            </div>
+            <p style="margin-top: 10px;">
+                Permite el acceso a la cámara y apunta al logo. ¡El video de YouTube debería aparecer!
+            </p>
+        </div>
+
+        <div class="success">
+            <strong>✅ ¡Listo!</strong><br>
+            Una vez completados estos pasos, tu aplicación de realidad aumentada estará funcionando.
+            Apunta la cámara al logo y disfruta de la experiencia AR.
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666;">
+            <p>¿Necesitas ayuda? Consulta el archivo <strong>README.md</strong> para más información</p>
+        </div>
+    </div>
+
+    <script>
+        // Verificar si la imagen del logo existe
+        const logoImg = document.getElementById('logo-preview');
+        logoImg.onerror = function () {
+            this.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="%23ddd" width="200" height="200"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="Arial" font-size="16">Logo no encontrado</text></svg>';
+        };
+    </script>
+</body>
+
+</html>

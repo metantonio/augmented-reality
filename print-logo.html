@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imprimir Logo para AR</title>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            .print-area {
+                page-break-after: always;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin: 40px 0;
+            padding: 40px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+        }
+
+        .logo-container img {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .instructions {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .instructions h2 {
+            color: #2196F3;
+            margin-top: 0;
+        }
+
+        .instructions ol {
+            line-height: 1.8;
+        }
+
+        .print-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .print-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .tip {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .print-area {
+            background: white;
+        }
+
+        .size-reference {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container no-print">
+        <h1>🖨️ Imprimir Logo para Realidad Aumentada</h1>
+
+        <div class="instructions">
+            <h2>📋 Instrucciones</h2>
+            <ol>
+                <li><strong>Haz clic en el botón "Imprimir Logo"</strong> abajo</li>
+                <li><strong>Selecciona tu impresora</strong> (o guarda como PDF)</li>
+                <li><strong>Configuración recomendada:</strong>
+                    <ul>
+                        <li>Orientación: Vertical</li>
+                        <li>Tamaño: A4 o Carta</li>
+                        <li>Calidad: Alta</li>
+                        <li>Color: Sí (si está disponible)</li>
+                    </ul>
+                </li>
+                <li><strong>Imprime el logo</strong></li>
+                <li><strong>Recorta el logo</strong> dejando un pequeño borde blanco</li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            <strong>💡 Consejo:</strong> Para mejores resultados, imprime en papel blanco de buena calidad.
+            El logo debe tener al menos 10x10 cm para una detección óptima.
+        </div>
+
+        <button class="print-button" onclick="window.print()">🖨️ Imprimir Logo</button>
+    </div>
+
+    <div class="print-area">
+        <h1 style="text-align: center; color: #667eea; margin: 40px 0 20px 0;">Logo AR - Marcador de Realidad Aumentada
+        </h1>
+
+        <div class="logo-container">
+            <img src="./img/logo.png" alt="Logo AR">
+        </div>
+
+        <div class="size-reference">
+            <p><strong>Tamaño recomendado:</strong> Mínimo 10x10 cm | Óptimo 15x15 cm</p>
+            <p><strong>Distancia de detección:</strong> 20-50 cm de la cámara</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <h3 style="color: #667eea; margin-top: 0;">🎯 Cómo Usar</h3>
+            <ol style="text-align: left; max-width: 500px; margin: 0 auto; line-height: 1.8;">
+                <li>Imprime este logo</li>
+                <li>Genera el archivo de patrón en: <code>http://localhost:8000/setup-marker.html</code></li>
+                <li>Abre la app AR en: <code>http://localhost:8000/index-youtube.html</code></li>
+                <li>Apunta la cámara a este logo impreso</li>
+                <li>¡Disfruta del video en realidad aumentada!</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding: 15px; border-top: 2px solid #eee;">
+            <p style="color: #999; font-size: 12px;">
+                Proyecto de Realidad Aumentada con AR.js<br>
+                Video: https://www.youtube.com/watch?v=zN9EJjVwpx8
+            </p>
+        </div>
+    </div>
+
+    <div class="container no-print" style="margin-top: 30px;">
+        <div class="instructions">
+            <h2>🎯 Próximos Pasos</h2>
+            <ol>
+                <li>Imprime este logo usando el botón de arriba</li>
+                <li>Ve a <a href="http://localhost:8000/setup-marker.html" target="_blank">setup-marker.html</a> para
+                    generar el patrón</li>
+                <li>Abre <a href="http://localhost:8000/index-youtube.html" target="_blank">index-youtube.html</a> para
+                    probar la app</li>
+                <li>Apunta la cámara al logo impreso</li>
+            </ol>
+        </div>
+    </div>
+</body>
+
+</html>

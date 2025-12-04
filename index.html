@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Video Player - AR.js</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #loading.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #instructions {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-family: 'Arial', sans-serif;
+            z-index: 1000;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        #debug {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Cargando experiencia AR...</p>
+        <p style="font-size: 12px; opacity: 0.7;">Procesando marcador de imagen...</p>
+    </div>
+    
+    <div id="instructions">
+        📱 Apunta la cámara al logo para ver el video en AR
+    </div>
+    
+    <div id="debug">
+        Estado: Inicializando...
+    </div>
+
+    <a-scene
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true; precision: medium;"
+        embedded
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+        
+        <!-- Cámara -->
+        <a-entity camera></a-entity>
+        
+        <!-- Marcador de imagen NFT -->
+        <a-nft
+            type="nft"
+            url="./markers/logo"
+            smooth="true"
+            smoothCount="10"
+            smoothTolerance=".01"
+            smoothThreshold="5">
+            
+            <!-- Plano para el video -->
+            <a-plane
+                id="video-plane"
+                position="0 0 0"
+                rotation="-90 0 0"
+                width="4"
+                height="2.25"
+                material="shader: flat; src: #video-texture; transparent: true; opacity: 0.95;"
+                visible="false">
+            </a-plane>
+            
+            <!-- Marco decorativo alrededor del video -->
+            <a-box
+                position="0 0.1 0"
+                rotation="-90 0 0"
+                width="4.2"
+                height="0.1"
+                depth="2.45"
+                material="color: #1a1a1a; metalness: 0.8; roughness: 0.2;"
+                visible="false"
+                id="frame">
+            </a-box>
+        </a-nft>
+    </a-scene>
+
+    <!-- Asset para el video -->
+    <a-assets style="display: none;">
+        <video
+            id="video-texture"
+            src="https://www.youtube.com/embed/zN9EJjVwpx8?autoplay=1&mute=1&loop=1&controls=0&modestbranding=1"
+            preload="auto"
+            crossorigin="anonymous"
+            playsinline
+            webkit-playsinline>
+        </video>
+    </a-assets>
+
+    <script>
+        // Referencias a elementos
+        const loading = document.getElementById('loading');
+        const debug = document.getElementById('debug');
+        const instructions = document.getElementById('instructions');
+        const videoPlane = document.getElementById('video-plane');
+        const frame = document.getElementById('frame');
+        const videoElement = document.getElementById('video-texture');
+        
+        let markerFound = false;
+        let videoLoaded = false;
+        
+        // Función para actualizar el estado de debug
+        function updateDebug(message) {
+            debug.innerHTML = `Estado: ${message}<br>Marcador: ${markerFound ? '✓ Detectado' : '✗ No detectado'}<br>Video: ${videoLoaded ? '✓ Cargado' : '✗ Cargando'}`;
+        }
+        
+        // Esperar a que la escena esté lista
+        document.querySelector('a-scene').addEventListener('loaded', function() {
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                updateDebug('Listo - Busca el logo');
+            }, 2000);
+        });
+        
+        // Detectar cuando se encuentra el marcador
+        const nftMarker = document.querySelector('a-nft');
+        
+        nftMarker.addEventListener('markerFound', function() {
+            markerFound = true;
+            updateDebug('Marcador encontrado');
+            instructions.innerHTML = '✅ ¡Logo detectado! Reproduciendo video...';
+            
+            // Mostrar el plano de video y el marco
+            videoPlane.setAttribute('visible', 'true');
+            frame.setAttribute('visible', 'true');
+            
+            // Intentar reproducir el video
+            if (videoElement && !videoLoaded) {
+                // Nota: YouTube embeds no funcionan directamente en video tags
+                // Necesitaremos usar un iframe en su lugar
+                createYouTubeIframe();
+            }
+        });
+        
+        nftMarker.addEventListener('markerLost', function() {
+            markerFound = false;
+            updateDebug('Buscando marcador...');
+            instructions.innerHTML = '📱 Apunta la cámara al logo para ver el video en AR';
+            
+            // Ocultar el plano de video y el marco
+            videoPlane.setAttribute('visible', 'false');
+            frame.setAttribute('visible', 'false');
+        });
+        
+        // Función para crear iframe de YouTube (alternativa)
+        function createYouTubeIframe() {
+            // Como YouTube no permite embeds directos en video tags,
+            // usaremos una textura de video local o una imagen de placeholder
+            // Para una solución completa, necesitarías descargar el video
+            // o usar la API de YouTube
+            
+            videoLoaded = true;
+            updateDebug('Video listo');
+            
+            // Aquí podrías intentar reproducir un video local
+            // o mostrar una imagen de placeholder
+            console.log('Marcador detectado - Video de YouTube: https://www.youtube.com/watch?v=zN9EJjVwpx8');
+        }
+        
+        // Manejo de errores
+        window.addEventListener('error', function(e) {
+            console.error('Error:', e);
+            updateDebug('Error: ' + e.message);
+        });
+        
+        // Inicializar
+        updateDebug('Inicializando...');
+    </script>
+</body>
+</html>

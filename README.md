@@ -174,3 +174,5 @@ Las contribuciones son bienvenidas. Si encuentras algún error o tienes sugerenc
 ---
 
 **Nota**: Este proyecto utiliza AR.js, una librería de código abierto para realidad aumentada en la web. Para más información, visita: https://github.com/AR-js-org/AR.js
+
+https://augmented-reality-e6tt.onrender.com/

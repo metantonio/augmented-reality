@@ -81,19 +81,17 @@
             opacity: 0.9;
         }
 
-        /* Container for the 3D transformed element */
+        /* Contenedor del espacio 3D HTML - Centrado para coincidir con el origen de cámara */
         #ar-html-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            /* Allow clicks to pass through to the scene if needed */
-            perspective: 1000px;
-            /* Essential for 3D transforms */
-            overflow: hidden;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            overflow: visible;
             z-index: 500;
+            perspective-origin: 50% 50%;
+            pointer-events: none;
         }
 
         #youtube-container {
@@ -101,13 +99,18 @@
             width: 640px;
             height: 360px;
             background: #000;
+
+            /* Centrar el elemento sobre su origen de transformación */
+            margin-left: -320px;
+            margin-top: -180px;
+
             transform-style: preserve-3d;
-            transform-origin: top left;
-            /* Critical for matrix3d alignment */
+            transform-origin: center center;
+
             pointer-events: auto;
-            /* Re-enable clicks for the video */
             display: none;
-            /* Hidden by default until marker found */
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
         }
 
         #youtube-container.visible {
@@ -118,7 +121,8 @@
             width: 100%;
             height: 100%;
             border: none;
-            border: 5px solid white;
+            border: 4px solid #667eea;
+            border-radius: 10px;
             box-sizing: border-box;
         }
 
@@ -128,7 +132,7 @@
             right: -20px;
             width: 40px;
             height: 40px;
-            background: red;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
             color: white;
             font-size: 24px;
@@ -138,6 +142,7 @@
             justify-content: center;
             z-index: 1001;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            border: 2px solid white;
         }
 
         #debug {
@@ -183,6 +188,16 @@
                 opacity: 0.5;
             }
         }
+
+        /* Ajustes para móvil */
+        @media (max-width: 768px) {
+            #youtube-container {
+                width: 320px;
+                height: 180px;
+                margin-left: -160px;
+                margin-top: -90px;
+            }
+        }
     </style>
 </head>
 
@@ -198,7 +213,7 @@
         <p>Apunta la cámara al logo para ver el video en 3D</p>
     </div>
 
-    <!-- Container for HTML elements that will be synced with AR -->
+    <!-- Contenedor 3D HTML -->
     <div id="ar-html-container">
         <div id="youtube-container">
             <div id="close-video">×</div>
@@ -216,7 +231,7 @@
     </div>
 
     <script>
-        // Component to sync HTML element with A-Frame entity
+        // Componente para sincronizar elemento HTML con entidad A-Frame
         AFRAME.registerComponent('html-overlay', {
             schema: {
                 target: { type: 'selector' }
@@ -230,24 +245,17 @@
                     return;
                 }
 
-                // Show the element if marker is visible
                 this.targetElement.style.display = 'block';
 
-                // Calculate the position of the marker in screen space
-                const vector = new THREE.Vector3();
-                const widthHalf = window.innerWidth / 2;
-                const heightHalf = window.innerHeight / 2;
-
-                // Get world position and project to 2D screen space
-                this.el.object3D.updateMatrixWorld();
-                vector.setFromMatrixPosition(this.el.object3D.matrixWorld);
-                vector.project(this.el.sceneEl.camera);
-
-                // Calculate CSS 3D Matrix
-                const matrix = this.el.object3D.matrixWorld;
+                // Calcular Matrices CSS 3D
+                const object3D = this.el.object3D;
                 const camera = this.el.sceneEl.camera;
 
-                const style = getObjectCSSMatrix(this.el.object3D, camera);
+                // Asegurar que las matrices están actualizadas
+                object3D.updateMatrixWorld();
+
+                // Obtener matriz de transformación CSS
+                const style = getObjectCSSMatrix(object3D, camera);
                 this.targetElement.style.transform = style;
             }
         });
@@ -260,19 +268,18 @@
             const mat = object.matrixWorld;
             const cMat = camera.matrixWorldInverse;
 
-            // We need the object relative to the camera
+            // Matriz ModelView (Mundo -> Cámara)
             const m = new THREE.Matrix4().multiplyMatrices(cMat, mat);
             const e = m.elements;
 
-            // CSS transform matrix
+            // Matriz de transformación CSS
             return 'matrix3d(' +
                 epsilon(e[0]) + ',' + epsilon(e[1]) + ',' + epsilon(e[2]) + ',' + epsilon(e[3]) + ',' +
-                epsilon(- e[4]) + ',' + epsilon(- e[5]) + ',' + epsilon(- e[6]) + ',' + epsilon(- e[7]) + ',' +
+                epsilon(-e[4]) + ',' + epsilon(-e[5]) + ',' + epsilon(-e[6]) + ',' + epsilon(-e[7]) + ',' +
                 epsilon(e[8]) + ',' + epsilon(e[9]) + ',' + epsilon(e[10]) + ',' + epsilon(e[11]) + ',' +
                 epsilon(e[12]) + ',' + epsilon(e[13]) + ',' + epsilon(e[14]) + ',' + epsilon(e[15]) +
                 ')';
         }
-
     </script>
 
     <a-scene vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;" embedded
@@ -282,16 +289,18 @@
             <img id="logo-marker" src="./img/logo.png" crossorigin="anonymous">
         </a-assets>
 
-        <!-- Apply the html-overlay component to the marker -->
-        <a-marker type="pattern" preset="custom" url="./markers/pattern-logo.patt" smooth="true" smoothCount="10"
-            html-overlay="target: #youtube-container">
+        <!-- Marcador base -->
+        <a-marker type="pattern" preset="custom" url="./markers/pattern-logo.patt" smooth="true" smoothCount="10">
 
-            <!-- Invisible plane to act as the anchor for the HTML element -->
-            <!-- We scale it to match the aspect ratio of the video (16:9) -->
-            <!-- Width 2, Height 1.125 (approx 16:9) -->
-            <!-- Rotated -45 degrees to face the user better -->
-            <a-plane position="0 0.5 0" rotation="-45 0 0" width="2" height="1.125"
-                material="opacity: 0; transparent: true;">
+            <!-- Entidad ROTADA que servirá de ancla para el HTML -->
+            <!-- Rotamos -90 en X para que el "frente" del HTML quede mirando hacia arriba (plano sobre la mesa) -->
+            <a-entity id="content-anchor" rotation="90 0 0" position="0 0 0" html-overlay="target: #youtube-container">
+            </a-entity>
+
+            <!-- Plano de referencia visual (para ver dónde está el marcador en 3D) -->
+            <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2"
+                material="color: #667eea; opacity: 0.3; transparent: true; side: double;"
+                animation="property: opacity; from: 0.3; to: 0.1; dir: alternate; loop: true; dur: 1000">
             </a-plane>
 
         </a-marker>
@@ -300,7 +309,7 @@
     </a-scene>
 
     <script>
-        // Referencias a elementos
+        // Lógica de UI y YouTube
         const loading = document.getElementById('loading');
         const debug = document.getElementById('debug');
         const instructions = document.getElementById('instructions');
@@ -315,75 +324,69 @@
         let markerFound = false;
         let videoPlaying = false;
 
-        // URL del video de YouTube
+        // URL original de YouTube
         const YOUTUBE_VIDEO_ID = 'zN9EJjVwpx8';
         const YOUTUBE_EMBED_URL = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&mute=0&rel=0&modestbranding=1`;
 
-        // Función para actualizar el estado de debug
         function updateStatus(type, active, message) {
             const statusElement = document.getElementById(`${type}-status`);
             if (statusElement) statusElement.className = `status-indicator ${active ? 'active' : 'inactive'}`;
 
             const debugLines = debug.querySelectorAll('div');
-            const statusMessages = {
-                'camera': 0,
-                'marker': 1,
-                'video': 2
-            };
-
-            if (debugLines[statusMessages[type]]) {
-                debugLines[statusMessages[type]].innerHTML =
-                    `<span class="status-indicator ${active ? 'active' : 'inactive'}" id="${type}-status"></span>${message}`;
+            const map = { 'camera': 0, 'marker': 1, 'video': 2 };
+            if (debugLines[map[type]]) {
+                debugLines[map[type]].innerHTML = `<span class="status-indicator ${active ? 'active' : 'inactive'}" id="${type}-status"></span>${message}`;
             }
         }
 
-        // Esperar a que la escena esté lista
         document.querySelector('a-scene').addEventListener('loaded', function () {
             setTimeout(() => {
                 loading.classList.add('hidden');
                 updateStatus('camera', true, 'Cámara: Activa ✓');
-
-                // Set initial perspective
-                const camera = document.querySelector('a-scene').camera;
-                const fov = camera.fov;
-                const cssPerspective = (camera.aspect * window.innerHeight / 2) / Math.tan(THREE.MathUtils.degToRad(fov / 2));
-                document.getElementById('ar-html-container').style.perspective = `${cssPerspective}px`;
-
+                updatePerspective();
             }, 1500);
         });
 
-        // Detectar cuando se encuentra el marcador
-        const marker = document.querySelector('a-marker');
-
-        marker.addEventListener('markerFound', function () {
-            markerFound = true;
-            updateStatus('marker', true, 'Marcador: Detectado ✓');
-            instructions.innerHTML = '<h3>✅ ¡Logo Detectado!</h3><p>Abriendo video de YouTube...</p>';
-            youtubeContainer.classList.add('visible');
-
-            // Mostrar el video de YouTube
-            if (!videoPlaying) {
-                showYouTubeVideo();
+        function updatePerspective() {
+            const scene = document.querySelector('a-scene');
+            if (scene && scene.camera) {
+                const camera = scene.camera;
+                const fov = camera.fov;
+                // Calcular perspectiva CSS para igualar FOV de cámara 3D
+                // Altura de ventana / 2 / tan(fov/2)
+                const cssPerspective = (window.innerHeight / 2) / Math.tan(THREE.MathUtils.degToRad(fov / 2));
+                document.getElementById('ar-html-container').style.perspective = `${cssPerspective}px`;
             }
-        });
-
-        marker.addEventListener('markerLost', function () {
-            markerFound = false;
-            updateStatus('marker', false, 'Marcador: No detectado');
-            instructions.innerHTML = '<h3>📱 Realidad Aumentada Activada</h3><p>Apunta la cámara al logo para ver el video en 3D</p>';
-            // Don't hide immediately to prevent flickering, let the component handle it
-        });
-
-        // Función para mostrar el video de YouTube
-        function showYouTubeVideo() {
-            if (youtubeIframe.src !== YOUTUBE_EMBED_URL) {
-                youtubeIframe.src = YOUTUBE_EMBED_URL;
-            }
-            videoPlaying = true;
-            updateStatus('video', true, 'Video: Reproduciendo ✓');
         }
 
-        // Función para cerrar el video
+        window.addEventListener('resize', updatePerspective);
+
+        const markerEl = document.querySelector('a-marker');
+
+        if (markerEl) {
+            markerEl.addEventListener('markerFound', function () {
+                markerFound = true;
+                updateStatus('marker', true, 'Marcador: Detectado ✓');
+                instructions.innerHTML = '<h3>✅ ¡Logo Detectado!</h3><p>Video 3D anclado al marcador</p>';
+                youtubeContainer.classList.add('visible');
+
+                if (!videoPlaying) {
+                    if (youtubeIframe.src !== YOUTUBE_EMBED_URL) {
+                        youtubeIframe.src = YOUTUBE_EMBED_URL;
+                    }
+                    videoPlaying = true;
+                    updateStatus('video', true, 'Video: Reproduciendo ✓');
+                }
+            });
+
+            markerEl.addEventListener('markerLost', function () {
+                markerFound = false;
+                updateStatus('marker', false, 'Marcador: No detectado');
+                instructions.innerHTML = '<h3>📱 Modo AR Activo</h3><p>Busca el logo para ver el video</p>';
+                // No ocultamos inmediatamente para evitar parpadeos, html-overlay lo maneja
+            });
+        }
+
         function closeYouTubeVideo() {
             youtubeContainer.classList.remove('visible');
             youtubeIframe.src = '';
@@ -391,29 +394,10 @@
             updateStatus('video', false, 'Video: Cerrado');
         }
 
-        // Event listener para cerrar el video
         closeVideoBtn.addEventListener('click', closeYouTubeVideo);
 
-        // Manejo de errores
-        window.addEventListener('error', function (e) {
-            console.error('Error:', e);
-            updateStatus('camera', false, 'Error: ' + e.message);
-        });
-
-        // Inicializar estados
+        // Inicializar
         updateStatus('camera', false, 'Cámara: Inicializando...');
-        updateStatus('marker', false, 'Marcador: No detectado');
-        updateStatus('video', false, 'Video: Esperando...');
-
-        // Handle resize
-        window.addEventListener('resize', () => {
-            const camera = document.querySelector('a-scene').camera;
-            if (camera) {
-                const fov = camera.fov;
-                const cssPerspective = (camera.aspect * window.innerHeight / 2) / Math.tan(THREE.MathUtils.degToRad(fov / 2));
-                document.getElementById('ar-html-container').style.perspective = `${cssPerspective}px`;
-            }
-        });
     </script>
 </body>
 

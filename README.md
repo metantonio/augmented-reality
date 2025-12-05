@@ -2,6 +2,12 @@
 
 Este proyecto utiliza AR.js para crear una experiencia de realidad aumentada que reproduce un video de YouTube cuando la cámara detecta el logo.
 
+[LIVE DEMO](https://augmented-reality-e6tt.onrender.com/index-youtube.html)
+
+Point the smartphone camera to the following marker:
+
+![Marker](img/marker.png)
+
 ## 🎯 Características
 
 - ✅ Detección de imagen personalizada (logo.png)
@@ -175,4 +181,3 @@ Las contribuciones son bienvenidas. Si encuentras algún error o tienes sugerenc
 
 **Nota**: Este proyecto utiliza AR.js, una librería de código abierto para realidad aumentada en la web. Para más información, visita: https://github.com/AR-js-org/AR.js
 
-https://augmented-reality-e6tt.onrender.com/index-youtube.html

@@ -6,7 +6,7 @@ Este proyecto utiliza AR.js para crear una experiencia de realidad aumentada que
 
 Point the smartphone camera to the following marker:
 
-![Marker](img/marker.png)
+<img src="img/marker.png" alt="Marker" >
 
 ## 🎯 Características
 
